@@ -1,4 +1,4 @@
-module github.com/vinyldns/go-vinyldns
+module github.com/willswire/go-vinyldns
 
 go 1.17
 
