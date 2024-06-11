@@ -20,10 +20,11 @@ import (
 
 // ClientConfiguration represents the vinyldns client configuration.
 type ClientConfiguration struct {
-	AccessKey string
-	SecretKey string
-	Host      string
-	UserAgent string
+	AccessKey  string
+	SecretKey  string
+	Host       string
+	UserAgent  string
+	HTTPClient *http.Client
 }
 
 // NewConfigFromEnv creates a new ClientConfiguration
@@ -35,10 +36,11 @@ func NewConfigFromEnv() ClientConfiguration {
 		ua = vua
 	}
 	return ClientConfiguration{
-		os.Getenv("VINYLDNS_ACCESS_KEY"),
-		os.Getenv("VINYLDNS_SECRET_KEY"),
-		os.Getenv("VINYLDNS_HOST"),
-		ua,
+		AccessKey:  os.Getenv("VINYLDNS_ACCESS_KEY"),
+		SecretKey:  os.Getenv("VINYLDNS_SECRET_KEY"),
+		Host:       os.Getenv("VINYLDNS_HOST"),
+		UserAgent:  ua,
+		HTTPClient: &http.Client{}, // Default HTTP client
 	}
 }
 
@@ -64,12 +66,17 @@ func NewClient(config ClientConfiguration) *Client {
 		config.UserAgent = defaultUA()
 	}
 
+	httpClient := config.HTTPClient
+	if httpClient == nil {
+		httpClient = &http.Client{}
+	}
+
 	return &Client{
-		config.AccessKey,
-		config.SecretKey,
-		config.Host,
-		&http.Client{},
-		config.UserAgent,
+		AccessKey:  config.AccessKey,
+		SecretKey:  config.SecretKey,
+		Host:       config.Host,
+		HTTPClient: httpClient,
+		UserAgent:  config.UserAgent,
 	}
 }
 
